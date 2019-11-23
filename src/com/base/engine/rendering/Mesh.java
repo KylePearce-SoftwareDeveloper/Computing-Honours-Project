@@ -102,6 +102,7 @@ public class Mesh
         glDisableVertexAttribArray(2);
     }
     
+    
     private void calcNormals(Vertex[] vertices, int[] indices) 
     {
     	for(int i = 0; i < indices.length; i += 3)

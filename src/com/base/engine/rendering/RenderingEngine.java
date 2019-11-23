@@ -72,7 +72,7 @@ public class RenderingEngine extends MappedValues
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		object.renderAll(forwardAmbient, this); //- end of #40 test
+		object.renderAll(forwardAmbient, this);
 		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);

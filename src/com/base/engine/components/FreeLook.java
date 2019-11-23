@@ -48,9 +48,9 @@ public class FreeLook extends GameComponent
 			boolean rotX = deltaPos.getY() != 0;
 			if(rotY)
 				getTransform().rotate(yAxis, (float) Math.toRadians(deltaPos.getX() * sensitivity));
-			if(rotX)
-				getTransform().rotate(getTransform().getRot().getRight(), (float) Math.toRadians(-deltaPos.getY() * sensitivity));
-
+			//if(rotX) //20/11/19
+				//getTransform().rotate(getTransform().getRot().getRight(), (float) Math.toRadians(-deltaPos.getY() * sensitivity)); //20/11/19
+			
 			if(rotY || rotX)
 				Input.SetMousePosition(centerPosition);
 		}

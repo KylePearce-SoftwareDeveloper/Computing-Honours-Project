@@ -71,14 +71,15 @@ public class GameObject
 	
 	public void update(float delta)
 	{
-		for(GameComponent component: components)
+		for(GameComponent component: components)//6/11/19
 			component.update(delta);
 	}
 	
 	public void render(Shader shader, RenderingEngine renderingEngine)
 	{
-		for(GameComponent component: components)
+		for(GameComponent component: components) {
 			component.render(shader, renderingEngine);
+		}
 	}
 	
 	public ArrayList<GameObject> getAllAttached()
@@ -109,5 +110,11 @@ public class GameObject
 			for(GameObject child: children)
 				child.setEngine(engine);
 		}
+	}
+	
+	//12/11/19 - collision detection test
+	public CoreEngine getEngine()
+	{
+		return engine;
 	}
 }

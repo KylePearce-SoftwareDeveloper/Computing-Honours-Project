@@ -135,4 +135,10 @@ public class CoreEngine
 	public RenderingEngine getRenderingEngine() {
 		return renderingEngine;
 	}
+	
+	//12/11/19 - collision detection test
+	public Game getGame()
+	{
+		return game;
+	}
 }

@@ -17,6 +17,9 @@ public abstract class Game
 	
     public void init() {}
     
+    public void checkCollision() {}//12/11/19 - collision detection test
+    public void updateSpotLight() {}//13/11/19
+    
     public void input(float delta)
     {
     	getRootObject().inputAll(delta);
