@@ -6,6 +6,8 @@
 package com.base.engine.rendering;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -359,7 +361,10 @@ public class Shader
         
         try
         {
-            shaderReader = new BufferedReader(new FileReader("./res/shaders/"+fileName));
+            //shaderReader = new BufferedReader(new FileReader("./res/shaders/"+fileName));
+        	InputStream in = Shader.class.getResourceAsStream("/shaders/"+fileName);//17/12/19 - test
+        	//BufferedReader reader = new BufferedReader(new InputStreamReader(in));//17/12/19 - test
+            shaderReader = new BufferedReader(new InputStreamReader(in));//new BufferedReader(new FileReader("./res/shaders/"+fileName));//17/12/19 - test
             String line;
             while((line=shaderReader.readLine()) != null)
             {

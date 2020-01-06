@@ -69,7 +69,8 @@ public class Texture
 		
 		try 
 		{
-			BufferedImage image = ImageIO.read(new File("./res/textures/"+fileName));
+			//BufferedImage image = ImageIO.read(new File("./res/textures/"+fileName));
+			BufferedImage image = ImageIO.read(Texture.class.getResourceAsStream("/textures/"+fileName));//new File("./res/textures/"+fileName)); - 6/1/20 test
 			int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
 			
 			ByteBuffer buffer = Util.createByteBuffer(image.getHeight() * image.getWidth() * 4);

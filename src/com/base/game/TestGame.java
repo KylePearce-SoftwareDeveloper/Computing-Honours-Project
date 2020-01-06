@@ -5,6 +5,16 @@ import java.util.ArrayList;
 import com.base.engine.components.*;
 import com.base.engine.core.*;
 import com.base.engine.rendering.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+
 
 
 public class TestGame extends Game
@@ -12,6 +22,9 @@ public class TestGame extends Game
 	private ArrayList<MeshRenderer> meshRendererObjects = new ArrayList<MeshRenderer>();
 	private ArrayList<FreeMove> freeMoveObjects = new ArrayList<FreeMove>();
 	private ArrayList<SpotLight> spotLightObjects = new ArrayList<SpotLight>();
+	
+	String collectableFilePath = "powerup.wav";
+	String backgroundFilePath = "Soft-piano-music.wav";
     
     public void init()
     {
@@ -29,7 +42,7 @@ public class TestGame extends Game
         materialTest.addFloat("specularPower", 8);
         
         //MESHES
-        Mesh testMonkeyMesh = new Mesh("newMonkey.obj");
+        //Mesh testMonkeyMesh = new Mesh("newMonkey.obj");
         
         //MESH_RENDERERS
         MeshRenderer wallRight = new MeshRenderer(null, materialCube, 0.25f, 3.0f, 10.0f);
@@ -73,9 +86,9 @@ public class TestGame extends Game
         GameObject CollisionBoxTest6 = new GameObject().addComponent(wallBack);
         CollisionBoxTest6.getTransform().getPos().set(0, 3, -10);
          
-        GameObject testMesh5 = new GameObject().addComponent(new LookAtComponent()).addComponent(new MeshRenderer(testMonkeyMesh, materialTest, 0.0f, 0.0f, 0.0f));// 11/7/19 test
-        testMesh5.getTransform().getPos().set(0, 3, 0);
-        testMesh5.getTransform().setRot(new Quaternion(new Vector3f(0,1,0), 0.4f));
+        //GameObject testMesh5 = new GameObject().addComponent(new LookAtComponent()).addComponent(new MeshRenderer(testMonkeyMesh, materialTest, 0.0f, 0.0f, 0.0f));// 11/7/19 test
+        //testMesh5.getTransform().getPos().set(0, 3, 0);
+        //testMesh5.getTransform().setRot(new Quaternion(new Vector3f(0,1,0), 0.4f));
          
         GameObject player = new GameObject();
         FreeMove playerMovement = new FreeMove(10.0f);
@@ -100,8 +113,10 @@ public class TestGame extends Game
         addObject(CollisionBoxTest4);
         addObject(CollisionBoxTest5);
         addObject(CollisionBoxTest6);
-        addObject(testMesh5);
+        //addObject(testMesh5);
         addObject(player);
+        
+        playBackgroundMusic(backgroundFilePath, 0.5f);
     }
     
     
@@ -130,5 +145,72 @@ public class TestGame extends Game
     {
     	spotLightObjects.get(0).getParent().getTransform().setPos(freeMoveObjects.get(0).getNewPos());
     	spotLightObjects.get(0).getParent().getTransform().setRot(freeMoveObjects.get(0).getTransform().getRot());
+    }
+    
+    public static void playCollectableMusic(String filePath, float volume)
+    {
+    	try
+    	{
+    		InputStream in = TestGame.class.getResourceAsStream("/music/"+filePath);//the next 5 lines including this are 6/1/20 test
+    		BufferedReader musicReader = new BufferedReader(new InputStreamReader(in));
+    		//File musicPath = new File(filePath);
+    		String line= musicReader.readLine();
+    		if(line != null)
+    		{
+    			AudioInputStream audioinput = AudioSystem.getAudioInputStream(TestGame.class.getResource("/music/"+filePath));//musicPath);
+    			Clip clip = AudioSystem.getClip();
+    			clip.open(audioinput);
+    			if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+    				// set volume
+    				FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+    				float range = gainControl.getMaximum() - gainControl.getMinimum();
+    				float gain = (range * volume) + gainControl.getMinimum();
+    				gainControl.setValue(gain);
+    			}
+    			clip.start();
+    		}
+    		else
+    		{
+    			System.out.println("cant find path");
+    		}
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
+    }
+    
+    public static void playBackgroundMusic(String filePath, float volume)
+    {
+    	try
+    	{
+    		InputStream in = TestGame.class.getResourceAsStream("/music/"+filePath);//the next 5 lines including this are 6/1/20 test
+    		BufferedReader musicReader = new BufferedReader(new InputStreamReader(in));
+    		//File musicPath = new File(filePath);
+    		String line= musicReader.readLine();
+    		if(line != null)
+    		{
+    			AudioInputStream audioinput = AudioSystem.getAudioInputStream(TestGame.class.getResource("/music/"+filePath));
+    			Clip clip = AudioSystem.getClip();
+    			clip.open(audioinput);
+    			if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+    				// set volume
+    				FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+    				float range = gainControl.getMaximum() - gainControl.getMinimum();
+    				float gain = (range * volume) + gainControl.getMinimum();
+    				gainControl.setValue(gain);
+    			}
+    			clip.start();
+    			clip.loop(clip.LOOP_CONTINUOUSLY);
+    		}
+    		else
+    		{
+    			System.out.println("cant find path");
+    		}
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
     }
 }
