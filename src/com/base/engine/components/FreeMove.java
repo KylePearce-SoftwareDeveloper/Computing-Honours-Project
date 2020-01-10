@@ -49,6 +49,9 @@ public class FreeMove extends GameComponent
 			movementVector = movementVector.normalized();
 		
 		move(movementVector, movAmt);
+		
+		if(Input.GetKey(Input.KEY_ESCAPE))
+			System.exit(0);
 	}
 		
 	public void move(Vector3f dir, float amt) 

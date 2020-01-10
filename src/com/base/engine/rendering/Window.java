@@ -26,7 +26,7 @@ public class Window
         Display.setTitle(title);
         try 
         {
-            Display.setDisplayMode(new DisplayMode(width, height));
+            Display.setDisplayModeAndFullscreen(Display.getDesktopDisplayMode());
             Display.create();
             Keyboard.create();
             Mouse.create();
