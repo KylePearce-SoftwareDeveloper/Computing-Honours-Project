@@ -20,6 +20,7 @@ import javax.sound.sampled.FloatControl;
 public class TestGame extends Game
 {
 	private ArrayList<MeshRenderer> meshRendererObjects = new ArrayList<MeshRenderer>();
+	private ArrayList<MeshRenderer> terrainObjects = new ArrayList<MeshRenderer>();
 	private ArrayList<FreeMove> freeMoveObjects = new ArrayList<FreeMove>();
 	private ArrayList<SpotLight> spotLightObjects = new ArrayList<SpotLight>();
 	
@@ -62,7 +63,7 @@ public class TestGame extends Game
         meshRendererObjects.add(wallFront);
         meshRendererObjects.add(wallBack);
         
-        MeshRenderer terraineMesh = new MeshRenderer(magenta, "heightmap.png");//12/1/2020 - terraine
+        MeshRenderer terrainMesh = new MeshRenderer(magenta, "heightmap.png");//12/1/2020 - terraine
          
         //GAME_OBJECTS
         GameObject directionalLightObject = new GameObject();
@@ -96,13 +97,7 @@ public class TestGame extends Game
         //testMesh5.getTransform().getPos().set(0, 3, 0);
         //testMesh5.getTransform().setRot(new Quaternion(new Vector3f(0,1,0), 0.4f));
          
-        GameObject player = new GameObject();
-        FreeMove playerMovement = new FreeMove(10.0f);
-        freeMoveObjects.add(playerMovement);
-        player.getTransform().getPos().set(5, 3, 0);
-        player.addComponent(new FreeLook(0.5f));
-        player.addComponent(playerMovement);
-        player.addComponent(new Camera((float)Math.toRadians(70.0f), (float)Window.getWidth()/(float)Window.getHeight(), 0.01f, 1000.0f));
+        
         
         GameObject spotLightObject = new GameObject();
         SpotLight spotLight =  new SpotLight(new Vector3f(0,1,1), 0.4f, new Attenuation(0,0,0.1f), 0.7f);
@@ -111,8 +106,17 @@ public class TestGame extends Game
         spotLightObject.getTransform().getPos().set(5,5,0);//13/11/19
         
         GameObject terraineObject = new GameObject();
-        terraineObject.addComponent(terraineMesh);
+        terrainObjects.add(terrainMesh);
+        terraineObject.addComponent(terrainMesh);
         terraineObject.getTransform().getPos().set(0,0,0);
+        
+        GameObject player = new GameObject();
+        FreeMove playerMovement = new FreeMove(20.0f);
+        freeMoveObjects.add(playerMovement);
+        player.getTransform().getPos().set(5, 3, 0);
+        player.addComponent(new FreeLook(0.5f));
+        player.addComponent(playerMovement);
+        player.addComponent(new Camera((float)Math.toRadians(70.0f), (float)Window.getWidth()/(float)Window.getHeight(), 0.01f, 1000.0f));
          
         addObject(directionalLightObject);
         addObject(pointLightObject);
@@ -149,6 +153,17 @@ public class TestGame extends Game
     				}
     			}
     		}
+    	}
+	}
+    
+    public void checkTerraineHeight() {
+    	for(FreeMove currentFreeMove: freeMoveObjects) {
+    		Vector3f playerPos = currentFreeMove.getParent().getTransform().getPos();
+    		float playerXPos = playerPos.getX();
+    		float playerZPos = playerPos.getZ();
+    		float terrainHeight = terrainObjects.get(0).getHeightOfTerraine(playerXPos, playerZPos);
+    		
+    		currentFreeMove.getParent().getTransform().getPos().setY(terrainHeight+2.0f);
     	}
 	}
     

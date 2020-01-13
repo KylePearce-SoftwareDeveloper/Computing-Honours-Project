@@ -29,6 +29,8 @@ public class MeshRenderer extends GameComponent
 	private static final float MAX_HEIGHT = 40;
 	private static final float MAX_PIXEL_COLOUR = 256 * 256 * 256;
 	
+	private float[][] heights;
+	
 	public MeshRenderer(Mesh mesh, Material material, float scaleX, float scaleY, float scaleZ)
 	{
 		if(mesh == null)
@@ -94,6 +96,7 @@ public class MeshRenderer extends GameComponent
 			e.printStackTrace();
 		}
 		int VERTEX_COUNT = image.getHeight();
+		heights = new float[VERTEX_COUNT][VERTEX_COUNT];
 		
 		int count = VERTEX_COUNT * VERTEX_COUNT;
 		float[] vertices = new float[count * 3];
@@ -107,7 +110,11 @@ public class MeshRenderer extends GameComponent
 		for(int i=0;i<VERTEX_COUNT;i++){
 			for(int j=0;j<VERTEX_COUNT;j++){
 				vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * SIZE;  //0
-				vertices[vertexPointer*3+1] = getHeight(j, i, image);									    //1
+				
+				float height = getHeight(j, i, image);
+				heights[j][i] = height;
+				
+				vertices[vertexPointer*3+1] = height;									    //1
 				vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * SIZE;//2
 				normals[vertexPointer*3] = 0;											//0
 				normals[vertexPointer*3+1] = 1;											//1
@@ -149,6 +156,38 @@ public class MeshRenderer extends GameComponent
 		height /= MAX_PIXEL_COLOUR/2f;
 		height *= MAX_HEIGHT;
 		return height;
+	}
+	
+	public float getHeightOfTerraine(float worldX, float worldZ) {
+		float terrainX = worldX - this.getParent().getTransform().getPos().getX();
+		float terrainZ = worldZ - this.getParent().getTransform().getPos().getZ();
+		float gridSquareSize = SIZE / ((float)heights.length -1);
+		int gridX = (int) Math.floor(terrainX / gridSquareSize);
+		int gridZ = (int) Math.floor(terrainZ / gridSquareSize);
+		if(gridX >= heights.length - 1 || gridZ >= heights.length -1 || gridX < 0 || gridZ < 0) {
+			return 0;
+		}
+		float xCoord = (terrainX % gridSquareSize)/gridSquareSize;
+		float zCoord = (terrainZ % gridSquareSize)/gridSquareSize;
+		float answer;
+		if(xCoord <= (1 - zCoord)) {
+			answer = barryCentric(new Vector3f(0, heights[gridX][gridZ], 0), 
+								  new Vector3f(1,heights[gridX + 1][gridZ], 0), 
+								  new Vector3f(0,heights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
+		}else {
+			answer = barryCentric(new Vector3f(1, heights[gridX + 1][gridZ], 0), 
+								  new Vector3f(1,heights[gridX + 1][gridZ + 1], 1), 
+								  new Vector3f(0,heights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
+		}
+		return answer;
+	}
+	
+	public static float barryCentric(Vector3f p1, Vector3f p2, Vector3f p3, Vector2f pos) {
+		float det = (p2.getZ() - p3.getZ()) * (p1.getX() - p3.getX()) + (p3.getX() - p2.getX()) * (p1.getZ() - p3.getZ());
+		float l1 = ((p2.getZ() - p3.getZ()) * (pos.getX() - p3.getX()) + (p3.getX() - p2.getX()) * (pos.getY() - p3.getZ())) / det;
+		float l2 = ((p3.getZ() - p1.getZ()) * (pos.getX() - p3.getX()) + (p1.getX() - p3.getX()) * (pos.getY() - p3.getZ())) / det;
+		float l3 = 1.0f - l1 - l2;
+		return l1 * p1.getY() + l2 * p2.getY() + l3 * p3.getY();
 	}
 	
 	@Override

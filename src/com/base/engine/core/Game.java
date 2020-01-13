@@ -19,6 +19,7 @@ public abstract class Game
     
     public void checkCollision() {}//12/11/19 - collision detection test
     public void updateSpotLight() {}//13/11/19
+    public void checkTerraineHeight() {}//13/1/20
     
     public void input(float delta)
     {
