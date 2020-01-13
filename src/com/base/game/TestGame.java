@@ -24,7 +24,7 @@ public class TestGame extends Game
 	private ArrayList<SpotLight> spotLightObjects = new ArrayList<SpotLight>();
 	
 	String collectableFilePath = "powerup.wav";
-	String backgroundFilePath = "Soft-piano-music.wav";
+	String backgroundFilePath = "Multiverse.wav";
     
     public void init()
     {
@@ -40,6 +40,10 @@ public class TestGame extends Game
         materialTest.addTexture("diffuse", new Texture("white.jpg"));
         materialTest.addFloat("specularIntensity", 1);
         materialTest.addFloat("specularPower", 8);
+        Material magenta = new Material();
+        magenta.addTexture("diffuse", new Texture("magenta.jpg"));
+        magenta.addFloat("specularIntensity", 1);
+        magenta.addFloat("specularPower", 8);
         
         //MESHES
         //Mesh testMonkeyMesh = new Mesh("newMonkey.obj");
@@ -57,10 +61,12 @@ public class TestGame extends Game
         meshRendererObjects.add(wallTop);
         meshRendererObjects.add(wallFront);
         meshRendererObjects.add(wallBack);
+        
+        MeshRenderer terraineMesh = new MeshRenderer(magenta, "heightmap.png");//12/1/2020 - terraine
          
         //GAME_OBJECTS
         GameObject directionalLightObject = new GameObject();
-        DirectionalLight directionalLight = new DirectionalLight(new Vector3f(0,0,1), 0.4f);
+        DirectionalLight directionalLight = new DirectionalLight(new Vector3f(0.5f,0.5f,0.5f), 0.4f);
         directionalLightObject.addComponent(directionalLight);
         directionalLight.getTransform().setRot(new Quaternion(new Vector3f(1,0,0), (float)Math.toRadians(-45)));
                   
@@ -103,6 +109,10 @@ public class TestGame extends Game
         spotLightObjects.add(spotLight);
         spotLightObject.addComponent(spotLight);
         spotLightObject.getTransform().getPos().set(5,5,0);//13/11/19
+        
+        GameObject terraineObject = new GameObject();
+        terraineObject.addComponent(terraineMesh);
+        terraineObject.getTransform().getPos().set(0,0,0);
          
         addObject(directionalLightObject);
         addObject(pointLightObject);
@@ -113,6 +123,7 @@ public class TestGame extends Game
         addObject(CollisionBoxTest4);
         addObject(CollisionBoxTest5);
         addObject(CollisionBoxTest6);
+        addObject(terraineObject);
         //addObject(testMesh5);
         addObject(player);
         
@@ -134,7 +145,7 @@ public class TestGame extends Game
     			if (Math.abs(tmp.getY() - testMeshPos.getY()) < testPlayerScale.getY() + (testMeshScale.getY()) / 1.0) {
     				//check the Z axis
     				if (Math.abs(tmp.getZ() - testMeshPos.getZ()) < testPlayerScale.getZ() + (testMeshScale.getZ()) / 1.0) {
-    					freeMoveObjects.get(0).getParent().getTransform().setPos(freeMoveObjects.get(0).getOldPos());
+    					//freeMoveObjects.get(0).getParent().getTransform().setPos(freeMoveObjects.get(0).getOldPos());
     				}
     			}
     		}
