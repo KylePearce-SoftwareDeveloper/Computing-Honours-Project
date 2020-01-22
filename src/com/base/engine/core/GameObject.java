@@ -37,6 +37,14 @@ public class GameObject
 		return this;
 	}
 	
+	public void deleteComponent(int index)
+	{
+		components.remove(index);
+		//component.setParent(this);
+		
+		//return this;
+	}
+	
 	public void inputAll(float delta)
 	{
 		input(delta);

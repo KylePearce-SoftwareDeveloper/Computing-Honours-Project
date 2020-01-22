@@ -29,6 +29,9 @@ public class Mesh
 	private static HashMap<String, MeshResource> loadedModels = new HashMap<String, MeshResource>(); 
 	private MeshResource resource;
 	private String fileName;
+	
+	private Vertex[] vertices;//14/1/20 
+	private int[] indices;//14/1/20 
     
     public Mesh(String fileName)
     {
@@ -67,8 +70,11 @@ public class Mesh
     	}
     }
 
-    private void addVertices(Vertex[] vertices, int[] indices, boolean calcNormals)
+    public void addVertices(Vertex[] vertices, int[] indices, boolean calcNormals)//14/1/20 made public test 
     {
+    	this.vertices = vertices;//14/1/20
+    	this.indices = indices;//14/1/20
+    	
     	if(calcNormals)
     	{
     		calcNormals(vertices, indices);
@@ -114,11 +120,52 @@ public class Mesh
     		Vector3f v1 = vertices[i1].getPos().sub(vertices[i0].getPos()); 
     		Vector3f v2 = vertices[i2].getPos().sub(vertices[i0].getPos());
     		
+    		//test
+    		//Vector3f provokingVertex = vertices[i0].getPos();
+    		//Vector3f oneBesideIt = vertices[i1].getPos();
+    		//Vector3f p1 = vertices[i1].getPos();
+    		//Vector3f p2 = vertices[i2].getPos();
+    		//Vector3f a = p1.sub(p0);
+    		//Vector3f b = p2.sub(p0);
+    		//Vector3f c = a.cross(b);
+    		
     		Vector3f normal = v1.cross(v2).normalized();
     		
     		vertices[i0].setNormal(vertices[i0].getNormal().add(normal));
     		vertices[i1].setNormal(vertices[i1].getNormal().add(normal));
     		vertices[i2].setNormal(vertices[i2].getNormal().add(normal));
+    	}
+    	
+    	for(int i = 0; i < vertices.length; i++)
+    		vertices[i].setNormal(vertices[i].getNormal().normalized());
+    	
+    }
+    
+    private void calcNormalsLowPolly(Vertex[] vertices, int[] indices) 
+    {
+    	for(int i = 0; i < indices.length; i += 3)
+    	{
+    		int i0 = indices[i];
+    		int i1 = indices[i+1];
+    		int i2 = indices[i+2];
+    		
+    		Vector3f v1 = vertices[i1].getPos().sub(vertices[i0].getPos()); 
+    		Vector3f v2 = vertices[i2].getPos().sub(vertices[i0].getPos());
+    		
+    		//test
+    		//Vector3f provokingVertex = vertices[i0].getPos();
+    		//Vector3f oneBesideIt = vertices[i1].getPos();
+    		//Vector3f p1 = vertices[i1].getPos();
+    		//Vector3f p2 = vertices[i2].getPos();
+    		//Vector3f a = p1.sub(p0);
+    		//Vector3f b = p2.sub(p0);
+    		//Vector3f c = a.cross(b);
+    		
+    		Vector3f normal = v1.cross(v2).normalized();
+    		
+    		vertices[i0].setNormal(vertices[i0].getNormal().add(normal));
+    		//vertices[i1].setNormal(vertices[i1].getNormal().add(normal));
+    		//vertices[i2].setNormal(vertices[i2].getNormal().add(normal));
     	}
     	
     	for(int i = 0; i < vertices.length; i++)
@@ -161,5 +208,13 @@ public class Mesh
         
         
         return null;
+    }
+    
+    public Vertex[] getVertices() {//14/1/20
+    	return vertices;
+    }
+    
+    public int[] getIndices() {//14/1/20
+    	return indices;
     }
 }
