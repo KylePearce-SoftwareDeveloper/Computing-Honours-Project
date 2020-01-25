@@ -1,6 +1,8 @@
 package com.base.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 import com.base.engine.components.*;
 import com.base.engine.core.*;
@@ -24,6 +26,10 @@ public class TestGame extends Game
 	private ArrayList<MeshRenderer> waterObjects = new ArrayList<MeshRenderer>();//14/1/20 - water test
 	private ArrayList<FreeMove> freeMoveObjects = new ArrayList<FreeMove>();
 	private ArrayList<SpotLight> spotLightObjects = new ArrayList<SpotLight>();
+	//Mesh treeMesh = new Mesh("Lowpoly_tree_sample.obj");
+	private ArrayList<MeshRenderer> trees = new ArrayList<MeshRenderer>(600);
+	private ArrayList<GameObject> treeObjects = new ArrayList<GameObject>(600);
+	//private ArrayList<Vector3f> treePositions = new ArrayList<Vector3f>(100);
 	
 	String collectableFilePath = "powerup.wav";
 	String backgroundFilePath = "Multiverse.wav";
@@ -66,9 +72,33 @@ public class TestGame extends Game
         white.addTexture("diffuse", new Texture("white.jpg"));
         white.addFloat("specularIntensity", 1);
         white.addFloat("specularPower", 8);
+        Material black = new Material();
+        black.addTexture("diffuse", new Texture("black.jpg"));
+        black.addFloat("specularIntensity", 1);
+        black.addFloat("specularPower", 8);
         
         //MESHES
         //Mesh testMonkeyMesh = new Mesh("newMonkey.obj");
+        //TREES
+        Random treePos = new Random();
+        Mesh tree1Mesh = new Mesh("Lowpoly_tree_sample.obj");
+        Mesh tree2Mesh = new Mesh("Lowpoly_tree_sample.obj");
+        //treePositions.add(new Vector3f(treePos.nextInt(800),0.0f,treePos.nextInt(800)))
+        //MeshRenderer treeRenderer = new MeshRenderer(treeMesh, black, 0.0f, 0.0f, 0.0f);
+        //trees.add(treeRenderer);
+        for(int i = 0; i<300; i++) {
+        	trees.add(i, new MeshRenderer(tree1Mesh, black, 0.0f, 0.0f, 0.0f));
+        	//trees.get(i)= new MeshRenderer(treeMesh, black, 0.0f, 0.0f, 0.0f);
+        }
+        for(int i = 300; i<600; i++) {
+        	trees.add(i, new MeshRenderer(tree2Mesh, black, 0.0f, 0.0f, 0.0f));
+        	//trees.get(i)= new MeshRenderer(treeMesh, black, 0.0f, 0.0f, 0.0f);
+        }
+        for(int i = 0; i<600; i++) {
+        	treeObjects.add(i, new GameObject().addComponent(trees.get(i)));
+        	treeObjects.get(i).getTransform().setPos(new Vector3f(treePos.nextInt(800),0.0f,treePos.nextInt(800)));
+        	treeObjects.get(i).getTransform().setRot(new Quaternion(new Vector3f(0,1,0), (float)Math.toRadians(treePos.nextInt(365))));
+        }
         
         //MESH_RENDERERS
         MeshRenderer wallRight = new MeshRenderer(null, materialCube, 0.25f, 3.0f, 10.0f);
@@ -86,10 +116,10 @@ public class TestGame extends Game
         
         MeshRenderer terrainMesh = new MeshRenderer(magenta, "heightmap.png");//12/1/2020 - terraine
         //WATER
-        MeshRenderer waterMesh1 = new MeshRenderer(cyan, "water1.png");
-        MeshRenderer waterMesh2 = new MeshRenderer(cyan, "water2.png");
-        MeshRenderer waterMesh3 = new MeshRenderer(cyan, "water3.png");
-        MeshRenderer waterMesh4 = new MeshRenderer(cyan, "water4.png");
+        MeshRenderer waterMesh1 = new MeshRenderer(magenta, "water1.png");
+        MeshRenderer waterMesh2 = new MeshRenderer(magenta, "water2.png");
+        MeshRenderer waterMesh3 = new MeshRenderer(magenta, "water3.png");
+        MeshRenderer waterMesh4 = new MeshRenderer(magenta, "water4.png");
         //WATER GLARE
         /*
         MeshRenderer waterGlareMesh1 = new MeshRenderer(cyan, "testwater.png");
@@ -182,7 +212,18 @@ public class TestGame extends Game
         player.addComponent(new FreeLook(0.5f));
         player.addComponent(playerMovement);
         player.addComponent(new Camera((float)Math.toRadians(70.0f), (float)Window.getWidth()/(float)Window.getHeight(), 0.01f, 1000.0f));
-         
+        
+        //Tree
+        /*
+        GameObject treeObject = new GameObject();
+        treeObject.addComponent(treeRenderer);
+        treeObject.getTransform().getPos().set(40, 0, 60);
+        */
+        
+        for(int i = 0; i<600; i++) {
+        	addObject(treeObjects.get(i));
+        }
+        
         addObject(directionalLightObject);
         //addObject(pointLightObject);
         //addObject(spotLightObject);
@@ -205,6 +246,7 @@ public class TestGame extends Game
         */
         //addObject(testMesh5);
         addObject(player);
+        //addObject(treeObject);
         
         playBackgroundMusic(backgroundFilePath, 0.5f);
     }
@@ -231,6 +273,29 @@ public class TestGame extends Game
     		}
     	}
     	*/
+	}
+    
+    public void checkTreeCollision() {
+    	
+    	for(MeshRenderer currentTreeObject: trees) {
+    		Vector3f treePos = currentTreeObject.getParent().getTransform().getPos();
+    		Vector3f treeScale = new Vector3f(1.0f, 1.0f, 1.0f);//currentMeshRenderer.getScaleAttrib();//new Vector3f(2.0f, 2.0f, 2.0f);
+    		Vector3f testPlayerPos = freeMoveObjects.get(0).getParent().getTransform().getPos();
+    		Vector3f testPlayerScale = new Vector3f(1.0f, 1.0f, 1.0f);
+    	
+    		Vector3f tmp = new Vector3f(testPlayerPos.getX(), testPlayerPos.getY() - 1.0f, testPlayerPos.getZ());
+    		//check the X axis
+    		if (Math.abs(tmp.getX() - treePos.getX()) < testPlayerScale.getX() + (treeScale.getX()) / 1.0) {
+    			//check the Y axis
+    			if (Math.abs(tmp.getY() - treePos.getY()) < testPlayerScale.getY() + (treeScale.getY()) / 1.0) {
+    				//check the Z axis
+    				if (Math.abs(tmp.getZ() - treePos.getZ()) < testPlayerScale.getZ() + (treeScale.getZ()) / 1.0) {
+    					freeMoveObjects.get(0).getParent().getTransform().setPos(freeMoveObjects.get(0).getOldPos());
+    				}
+    			}
+    		}
+    	}
+    	
 	}
     
     public void checkTerraineHeight() {
@@ -294,6 +359,17 @@ public class TestGame extends Game
     		
     	}
 	}
+    
+    public void checkTerraineHeightTrees() {
+    	for(MeshRenderer currentTree: trees) {
+    		Vector3f treePos = currentTree.getParent().getTransform().getPos();
+    		float treeXPos = treePos.getX();
+    		float treeZPos = treePos.getZ();
+    		
+    		float terrainHeight = terrainObjects.get(0).getHeightOfTerraine(treeXPos, treeZPos);
+    		currentTree.getParent().getTransform().getPos().setY(terrainHeight);
+    	}
+    }
     /*
     public void updateWaterMesh() {
     	for(MeshRenderer currentWaterMesh: waterObjects) {

@@ -21,6 +21,8 @@ public abstract class Game
     public void updateSpotLight() {}//13/11/19
     public void checkTerraineHeight() {}//13/1/20
     public void updateWaterMesh() {}//14/1/20
+    public void checkTerraineHeightTrees() {}//22/1/20
+    public void checkTreeCollision() {}
     
     public void input(float delta)
     {
